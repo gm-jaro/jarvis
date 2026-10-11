@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jarvis</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="dot" id="conn-dot" title="Page connection"></span>Jarvis</div>
+    <div class="chips">
+      <span class="chip" id="chip-brain"><b>Brain</b><span class="model"></span><span class="state">…</span></span>
+      <span class="chip" id="chip-vision"><b>Eyes</b><span class="model"></span><span class="state">…</span></span>
+      <span class="chip" id="chip-head"><b>Camera</b><span class="model"></span><span class="state">…</span></span>
+    </div>
+    <div class="sys" id="sys">…</div>
+  </header>
+
+  <main>
+    <section class="left">
+      <div class="cam">
+        <img id="cam" alt="Live camera preview">
+        <span class="live">LIVE</span>
+        <span class="where" id="cam-where"></span>
+      </div>
+
+      <div class="now" id="now" aria-live="polite">Connecting…</div>
+
+      <div class="panel models">
+        <label>Brain <small>decides and controls the camera</small>
+          <select id="sel-brain" data-lock></select>
+        </label>
+        <label>Eyes <small>describe the camera image</small>
+          <select id="sel-vision" data-lock></select>
+        </label>
+        <p class="hint">Changing the brain starts a new conversation. The same model can play both roles.</p>
+      </div>
+
+      <div class="panel head-panel">
+        <svg id="dial" viewBox="0 0 220 130" role="img" aria-label="Camera direction"></svg>
+        <div class="controls">
+          <div class="pad" aria-label="Manual head control">
+            <button data-dir="up" data-lock title="Up">▲</button>
+            <button data-dir="left" data-lock title="Left">◀</button>
+            <button data-dir="center" data-lock title="Center">●</button>
+            <button data-dir="right" data-lock title="Right">▶</button>
+            <button data-dir="down" data-lock title="Down">▼</button>
+          </div>
+          <label class="step">step
+            <select id="step"><option>10</option><option selected>30</option><option>60</option></select>°
+          </label>
+          <button id="btn-describe" data-lock>Describe the view</button>
+        </div>
+      </div>
+
+      <details class="panel how">
+        <summary>How it works</summary>
+        <p><b class="c-brain">Brain</b> (Bielik 1.5B in vLLM or Gemma 4 E4B in Ollama) reads the command, thinks
+          and decides what to use. It has two tools: <code>turn_camera</code> turns the head (Wemos D1 mini + 2× SG90),
+          and <code>describe_view</code> takes a photo and asks the eyes for a description.</p>
+        <p><b class="c-vision">Eyes</b> (Gemma 3 12B or Gemma 4 E4B) look at the photo and describe it in Polish.
+          The brain gets this description as the tool result and answers based on it.</p>
+        <p>On the right you can see every step in order: the brain's reasoning (expandable), tool calls,
+          the photo the eyes received, their description and the final answer.</p>
+      </details>
+    </section>
+
+    <section class="right">
+      <div class="timeline" id="timeline"></div>
+      <form class="composer" id="composer">
+        <div class="suggest" id="suggest">
+          <button type="button" data-lock>Rozejrzyj się i powiedz, co jest w pokoju.</button>
+          <button type="button" data-lock>Spójrz w lewo i opisz, co widzisz.</button>
+          <button type="button" data-lock>Czy ktoś jest przed kamerą?</button>
+          <button type="button" data-lock>Spójrz w górę. Co tam jest?</button>
+        </div>
+        <textarea id="input" rows="2" placeholder="Command for Jarvis (Enter sends, Shift+Enter for a new line)"></textarea>
+        <div class="row">
+          <label><input type="checkbox" id="think" checked> reasoning</label>
+          <span class="spacer"></span>
+          <button type="button" id="btn-reset" data-lock>New conversation</button>
+          <button type="button" id="btn-stop" class="danger" hidden>Stop</button>
+          <button type="submit" id="btn-send" class="primary" data-lock>Send</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
